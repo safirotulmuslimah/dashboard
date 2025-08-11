@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Monitoring Kandang Ayam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1f2a44;
+            --radius: 1rem;
+            --transition: .3s;
+            --text-light: #f5f7ff;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, .55);
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: #e3e8ff;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .card-dashboard {
+            background: var(--card);
+            border: none;
+            border-radius: var(--radius);
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, #ff5f7e, #ffb03b);
+            border: none;
+            color: #fff;
+        }
+
+        .control-card {
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            color: #fff;
+        }
+
+        .control-card .status {
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .btn-sm-light {
+            background: rgba(255, 255, 255, .1);
+            border: none;
+            color: #fff;
+        }
+
+        .badge-ideal {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .small-label {
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: .85;
+        }
+
+        .metric-number {
+            font-weight: 700;
+        }
+
+        .glow-box {
+            position: relative;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, rgba(117, 94, 255, .1), rgba(114, 194, 255, .05));
+            border: 1px solid rgba(255, 255, 255, .05);
+        }
+
+        .light-intensity {
+            background: linear-gradient(135deg, #ffc107, #ffcd38);
+            color: #1f2a44;
+        }
+
+        .chart-wrapper {
+            background: var(--card);
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .status-circle {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .btn-control {
+            min-width: 120px;
+            border-radius: .75rem;
+        }
+
+        .header {
+            background: #1f2a44;
+            border-radius: .75rem;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .title {
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .sub {
+            font-size: .9rem;
+            opacity: .9;
+        }
+
+        .clock {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .card-icon {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .08);
+            margin-right: .5rem;
+        }
+
+        .status-ideal-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, .1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .status-ideal-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #10b981, #22c55e);
+        }
+
+        .control-gradient-1 {
+            background: linear-gradient(135deg, #ff5f7e, #ff9f43);
+        }
+
+        .control-gradient-2 {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        }
+
+        .control-gradient-3 {
+            background: linear-gradient(135deg, #fcd34d, #f59e0b);
+        }
+
+        .rounded-lg {
+            border-radius: 1rem !important;
+        }
+
+        .mb-2 {
+            margin-bottom: .5rem !important;
+        }
+
+        .text-small {
+            font-size: .8rem;
+        }
+
+        .flex-gap {
+            gap: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1200px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- header -->
+        <div class="header w-100 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div style="font-size:60px;">
+                    <!-- placeholder ayam -->
+                    🐔
+                </div>
+                <div>
+                    <h2 class="title mb-1">DASHBOARD MONITORING KANDANG AYAM</h2>
+                    <div class="sub">Selamat Datang! <span style="color:#38bdf8;">Ayam Sehat, Telurpun Lezat!</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ms-auto d-flex align-items-center gap-4">
+                <div class="text-center">
+                    <div class="sub">Waktu Sekarang</div>
+                    <div class="clock" id="clock">--:--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- main grid -->
+        <div class="row g-4">
+            <!-- kiri besar -->
+            <div class="col-xl-8">
+                <!-- Kandangku -->
+                <div class="card-dashboard mb-4">
+                    <h5 class="mb-3">Kandangku</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card-dashboard p-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="card-icon">
+                                        💡
+                                    </div>
+                                    <div class="small-label">Jumlah Ayam</div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <div class="metric-number display-6">3200</div>
+                                        <div>ekor</div>
+                                    </div>
+                                    <div style="font-size:24px;">🐓</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-dashboard p-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="card-icon">
+                                        🪱
+                                    </div>
+                                    <div class="small-label">Jumlah Pakan</div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <div class="metric-number display-6">510</div>
+                                        <div>Kg</div>
+                                    </div>
+                                    <div style="font-size:24px;">🌾</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-dashboard p-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="card-icon">
+                                        💧
+                                    </div>
+                                    <div class="small-label">Air Minum</div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <div class="metric-number display-6">180</div>
+                                        <div>L</div>
+                                    </div>
+                                    <div style="font-size:24px;">🧊</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- intensitas cahaya & suhu & ketinggian -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card-dashboard light-intensity mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <div class="card-icon" style="background:rgba(255,255,255,.2);">💡</div>
+                                        <div>
+                                            <div class="small-label">Intensitas Cahaya</div>
+                                            <div style="font-weight:600;">Status Lampu: <span
+                                                    style="color:#065f46;">MENYALA 🌞</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="display-6" style="font-weight:700;">48699 Lux</div>
+                                </div>
+                                <div style="font-size:48px; opacity:.4;">🔆</div>
+                            </div>
+                        </div>
+                        <div class="card-dashboard mb-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="small-label mb-1">Ketinggian Lokasi</div>
+                                    <div style="font-weight:700;" class="display-6">452.8 mdpl</div>
+                                    <div style="font-size:.85rem; opacity:.8;">Dari permukaan laut</div>
+                                </div>
+                                <div style="font-size:48px; opacity:.3;">⛰️</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-dashboard h-100">
+                            <div class="d-flex justify-content-between mb-2">
+                                <div>
+                                    <div class="small-label">Suhu Kandang</div>
+                                    <div>Status: <span class="badge-ideal">IDEAL</span></div>
+                                </div>
+                                <div style="font-size:36px;">🌡️</div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="flex:1;">
+                                    <div class="display-1" id="temp-value" style="margin:0;">27.6°C</div>
+                                    <div class="text-small">Rekomendasi: <strong>24–30°C</strong> untuk ayam petelur
+                                    </div>
+                                    <div class="status-ideal-bar mt-2">
+                                        <div class="status-ideal-fill" id="temp-bar" style="width:65%;"></div>
+                                    </div>
+                                </div>
+                                <div style="flex-basis:120px;">
+                                    <!-- icon or graphic -->
+                                    <div style="font-size:60px; opacity:.5;">🔥</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- kanan -->
+            <div class="col-xl-4">
+                <!-- grafik -->
+                <!-- Grafik -->
+                <div class="bg-[#1e293b] rounded-2xl p-6">
+                    <h2 class="text-xl font-semibold mb-4">Grafik Suhu & Kelembapan</h2>
+                    <canvas id="chart"></canvas>
+                </div>
+
+                <!-- kontrol peralatan -->
+                <div class="card-dashboard mb-4">
+                    <h5 class="mb-3">Kontrol Peralatan</h5>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="control-card control-gradient-1">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <div class="card-icon" style="background:rgba(255,255,255,.2);">🌀</div>
+                                    <div class="ms-2">
+                                        <div class="fw-bold">Kipas</div>
+                                        <div class="status"><span class="status-circle"
+                                                style="background:#6b7280;"></span> Status: <span
+                                                class="ms-1">Mati</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-light btn-control">Nyalakan</button>
+                            </div>
+                        </div>
+                        <div class="control-card control-gradient-2">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <div class="card-icon" style="background:rgba(255,255,255,.2);">💧</div>
+                                    <div class="ms-2">
+                                        <div class="fw-bold">Pompa</div>
+                                        <div class="status"><span class="status-circle"
+                                                style="background:#6b7280;"></span> Status: <span
+                                                class="ms-1">Mati</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-light btn-control">Nyalakan</button>
+                            </div>
+                        </div>
+                        <div class="control-card control-gradient-3">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <div class="card-icon" style="background:rgba(255,255,255,.2);">🍽️</div>
+                                    <div class="ms-2">
+                                        <div class="fw-bold">Pakan</div>
+                                        <div class="status"><span class="status-circle"
+                                                style="background:#6b7280;"></span> Status: <span
+                                                class="ms-1">Mati</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-light btn-control">Nyalakan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JS logic -->
+    <div id="clock" style="font-size: 24px; color: white;"></div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock(); // Panggil langsung saat load
+    </script>
+
+    <script>
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['13:32', '13:33', '13:34', '13:35', '13:36', '13:37'],
+                datasets: [
+                    {
+                        label: 'Suhu (°C)',
+                        data: [27, 27.2, 27.4, 27.5, 27.6, 27.6],
+                        borderColor: 'yellow',
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Kelembapan (%)',
+                        data: [60, 59, 61, 60, 62, 61],
+                        borderColor: 'skyblue',
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Tekanan (hPa)',
+                        data: [1010, 1011, 1011, 1010, 1010, 1011],
+                        borderColor: 'violet',
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                plugins: { legend: { labels: { color: 'white' } } },
+                scales: {
+                    x: { ticks: { color: 'white' } },
+                    y: { ticks: { color: 'white' } }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
